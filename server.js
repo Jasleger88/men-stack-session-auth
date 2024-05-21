@@ -2,6 +2,7 @@ const dotenv = require('dotenv')
 dotenv.config();
 const express = require('express')
 const app = express ();
+const session = require("expression-session");
 
 const mongoose = require('mongoose')
 const methodOverride = require('method-override');
@@ -32,13 +33,20 @@ app.use(methodOverride('_method'));
 //morgan for loggin HTTP request
 app.use(morgan('dev'));
 
+app.use(session({
+    secret: process.env.SESSION_SECRET, 
+    resave: false, 
+    saveUninitalized: true,
+})
+);
+
 //use the auth controller for any requests that start with /auth
 app.use('/auth', authController);
 
 //set up a get request route
 
 app.get("/", async (req, res) => {
-    res.render("index.ejs");
+    res.render("index.ejs", {user: req.session.user});
 })
 
 //listen for incoming request
